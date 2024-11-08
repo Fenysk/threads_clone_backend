@@ -18,22 +18,11 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    async register(registerRequest: RegisterRequest) {
-        const createUserRequest = new CreateUserRequest();
-
-        createUserRequest.email = registerRequest.email;
-        createUserRequest.hashedPassword = await this.securityService.hashPassword(registerRequest.password);
-
-        const user = await this.usersService.createUser(createUserRequest);
-
-        return user;
-    }
-
     async verifyUser(email: string, password: string): Promise<User> {
         try {
             const user = await this.usersService.findUser({ email });
 
-            const isPasswordMatched = await this.securityService.verifyPassword(user.hashedPassword, password);
+            const isPasswordMatched = await this.securityService.verifyData(user.hashedPassword, password);
 
             if (!isPasswordMatched)
                 throw new UnauthorizedException('Invalid credentials');
@@ -44,10 +33,40 @@ export class AuthService {
         }
     }
 
+    async verifyUserRefreshToken(refreshToken: string, userId: string) {
+        try {
+            const user = await this.usersService.findUser({ id: userId });
+
+            const isRefreshTokenMatched = await this.securityService.verifyData(user.hashedRefreshToken, refreshToken);
+
+            if (!isRefreshTokenMatched)
+                throw new UnauthorizedException('Invalid refresh token');
+
+            return user;
+        } catch (error) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+    }
+
+    async register(registerRequest: RegisterRequest) {
+        const createUserRequest = new CreateUserRequest();
+
+        createUserRequest.email = registerRequest.email;
+        createUserRequest.hashedPassword = await this.securityService.hashData(registerRequest.password);
+
+        const user = await this.usersService.createUser(createUserRequest);
+
+        return user;
+    }
+
     async login(
         user: User,
         response: Response
     ) {
+        // Token payload
+        const tokenPayload: TokenPayload = { userId: user.id }
+
+        // Access token
         const expirationAccessTokenMs = parseInt(
             this.configService.getOrThrow('JWT_ACCESS_TOKEN_EXPIRATION_MS')
         );
@@ -59,8 +78,6 @@ export class AuthService {
             expirationAccessTokenMs
         );
 
-        const tokenPayload: TokenPayload = { userId: user.id }
-
         const accessToken = this.jwtService.sign(
             tokenPayload,
             {
@@ -69,12 +86,46 @@ export class AuthService {
             }
         );
 
+        // Refresh token
+        const expirationRefreshTokenMs = parseInt(
+            this.configService.getOrThrow('JWT_REFRESH_TOKEN_EXPIRATION_MS')
+        );
+
+        const expiresRefreshToken = new Date();
+
+        expiresRefreshToken.setMilliseconds(
+            expiresRefreshToken.getTime() +
+            expirationRefreshTokenMs
+        );
+
+        const refreshToken = this.jwtService.sign(
+            tokenPayload,
+            {
+                secret: this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET'),
+                expiresIn: `${expirationRefreshTokenMs}ms`
+            }
+        );
+
+        const hashedRefreshToken = await this.securityService.hashData(refreshToken);
+
+        await this.usersService.updateUser(
+            { id: user.id },
+            { hashedRefreshToken }
+        );
+
         const shouldHaveSecureConnection = this.configService.getOrThrow('NODE_ENV') !== 'development';
 
+        // Response cookies
         response.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: shouldHaveSecureConnection,
             expires: expiresAccessToken,
+        });
+
+        response.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: shouldHaveSecureConnection,
+            expires: expiresRefreshToken,
         });
     }
 

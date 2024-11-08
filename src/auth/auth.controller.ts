@@ -5,6 +5,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from '@prisma/client';
 import { Response } from 'express';
+import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +24,16 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     @HttpCode(HttpStatus.OK)
     async login(
+        @GetUser() user: User,
+        @Res({ passthrough: true }) response: Response
+    ) {
+        await this.authService.login(user, response);
+    }
+
+    @Post('refresh')
+    @UseGuards(JwtRefreshAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async refresh(
         @GetUser() user: User,
         @Res({ passthrough: true }) response: Response
     ) {

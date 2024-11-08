@@ -8,33 +8,33 @@ export class SecurityService {
         private readonly configService: ConfigService
     ) { }
 
-    async hashPassword(password: string): Promise<string> {
+    async hashData(data: string): Promise<string> {
         try {
             const secret = Buffer.from(this.configService.get<string>("ARGON2_SECRET") || '');
 
-            const hashedPassword = await argon2.hash(password, {
+            const hashedData = await argon2.hash(data, {
                 secret: secret,
             });
 
-            return hashedPassword;
+            return hashedData;
         } catch (error) {
             console.error(error);
-            throw new Error(`Failed to hash password: ${error.message}`);
+            throw new Error(`Failed to hash data: ${error.message}`);
         }
     }
 
-    async verifyPassword(hashedPassword: string, passwordToCompare: string): Promise<boolean> {
+    async verifyData(hashedData: string, dataToCompare: string): Promise<boolean> {
         try {
             const secret = Buffer.from(this.configService.get<string>("ARGON2_SECRET") || '');
 
-            const isPasswordMatched = await argon2.verify(hashedPassword, passwordToCompare, {
+            const isDataMatched = await argon2.verify(hashedData, dataToCompare, {
                 secret: secret,
             });
 
-            return isPasswordMatched;
+            return isDataMatched;
         } catch (error) {
             console.error(error);
-            throw new Error(`Failed to verify password: ${error.message}`);
+            throw new Error(`Failed to verify data: ${error.message}`);
         }
     }
 
