@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-local";
 import { AuthService } from "../auth.service";
-import { LoginRequest } from "../dto/login.request";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -14,8 +13,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(loginRequest: LoginRequest) {
-        return this.authService.verifyUser({ email: loginRequest.email, password: loginRequest.password });
+    async validate(email: string, password: string) {
+        return this.authService.verifyUser({ email, password });
     }
 
 }
