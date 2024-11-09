@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-access-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -9,7 +9,7 @@ export class UsersController {
         private readonly usersService: UsersService
     ) { }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAccessAuthGuard)
     @Get()
     getAllUsers(): Promise<User[]> {
         return this.usersService.getAllUsers();
