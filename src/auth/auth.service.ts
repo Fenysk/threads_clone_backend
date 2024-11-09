@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/token-payload.interface';
 import { Response } from 'express';
+import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,13 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    async verifyUser(email: string, password: string): Promise<User> {
+    async verifyUser({
+        email,
+        password
+    }: {
+        email: string,
+        password: string
+    }): Promise<User> {
         try {
             const user = await this.usersService.findUser({ email });
 
@@ -33,7 +40,13 @@ export class AuthService {
         }
     }
 
-    async verifyUserRefreshToken(refreshToken: string, userId: string) {
+    async verifyUserRefreshToken({
+        refreshToken,
+        userId
+    }: {
+        refreshToken: string,
+        userId: string
+    }): Promise<User> {
         try {
             const user = await this.usersService.findUser({ id: userId });
 
@@ -48,7 +61,23 @@ export class AuthService {
         }
     }
 
-    async register(registerRequest: RegisterRequest) {
+    async verifyUserGoogle({ googleProfile }: { googleProfile: Profile }) {
+        const { name, emails } = googleProfile;
+
+        const email = emails[0].value;
+
+        let user: User;
+
+        try {
+            user = await this.usersService.findUser({ email });
+        } catch (error) {
+            user = await this.usersService.createUser({ email });
+        }
+
+        return user;
+    }
+
+    async register({ registerRequest }: { registerRequest: RegisterRequest }) {
         const createUserRequest = new CreateUserRequest();
 
         createUserRequest.email = registerRequest.email;
@@ -59,10 +88,13 @@ export class AuthService {
         return user;
     }
 
-    async login(
+    async login({
+        user,
+        response
+    }: {
         user: User,
         response: Response
-    ) {
+    }) {
         // Token payload
         const tokenPayload: TokenPayload = { userId: user.id }
 
@@ -127,6 +159,17 @@ export class AuthService {
             secure: shouldHaveSecureConnection,
             expires: expiresRefreshToken,
         });
+
+        response.send(`
+            <html>
+                <head>
+                    <title>Authentification réussie</title>
+                </head>
+                <body>
+                    <p>Vous êtes maintenant connecté</p>
+                </body>
+            </html>
+        `);
     }
 
 }

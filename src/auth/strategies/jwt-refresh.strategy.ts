@@ -27,6 +27,6 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
         if (!refreshToken)
             throw new UnauthorizedException('Refresh token is required');
 
-        return this.authService.verifyUserRefreshToken(refreshToken, payload.userId);
+        return this.authService.verifyUserRefreshToken({ refreshToken, userId: payload.userId });
     }
 }
