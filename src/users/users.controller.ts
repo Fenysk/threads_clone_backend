@@ -16,7 +16,6 @@ export class UsersController {
         status: HttpStatus.OK,
         description: 'The users have been successfully retrieved'
     })
-    @UseGuards(JwtAccessAuthGuard)
     @Get()
     getAllUsers(): Promise<User[]> {
         return this.usersService.getAllUsers();

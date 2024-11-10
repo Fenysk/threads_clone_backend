@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -35,6 +36,7 @@ export class AuthController {
         status: HttpStatus.CREATED,
         description: 'The user has been successfully registered'
     })
+    @Public()
     @Post('register')
     register(
         @Body() registerRequest: RegisterRequest
@@ -56,6 +58,7 @@ export class AuthController {
         status: HttpStatus.OK,
         description: 'The user has been successfully logged in'
     })
+    @Public()
     @Post('login')
     @UseGuards(LocalAuthGuard)
     @HttpCode(HttpStatus.OK)
@@ -73,6 +76,7 @@ export class AuthController {
     })
     @ApiCookieAuth('refreshToken')
     @Post('refresh')
+    @Public()
     @UseGuards(JwtRefreshAuthGuard)
     @HttpCode(HttpStatus.OK)
     async refresh(
@@ -87,6 +91,7 @@ export class AuthController {
         status: HttpStatus.OK,
         description: 'The user has been successfully redirected to Google login'
     })
+    @Public()
     @Get('google/login')
     @UseGuards(GoogleAuthGuard)
     async googleLogin() { }
@@ -96,6 +101,7 @@ export class AuthController {
         status: HttpStatus.OK,
         description: 'The user has been successfully logged in'
     })
+    @Public()
     @Get('google/callback')
     @UseGuards(GoogleAuthGuard)
     async googleCallback(

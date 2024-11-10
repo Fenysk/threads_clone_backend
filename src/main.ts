@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
@@ -6,6 +6,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { JwtAccessAuthGuard } from './auth/guards/jwt-access-auth.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -29,6 +30,9 @@ async function bootstrap() {
 
   // Validation
   app.useGlobalPipes(new ValidationPipe({}));
+
+  // Global Auth Guard
+  app.useGlobalGuards(new JwtAccessAuthGuard(app.get(Reflector)));
 
   // Cookie Parser
   app.use(cookieParser());
