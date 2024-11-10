@@ -29,7 +29,7 @@ export class AuthService {
         try {
             const user = await this.usersService.findUser({ email });
 
-            const isPasswordMatched = await this.securityService.verifyData(user.hashedPassword, password);
+            const isPasswordMatched = await this.securityService.verifyData({ hashedData: user.hashedPassword, dataToCompare: password });
 
             if (!isPasswordMatched)
                 throw new UnauthorizedException('Invalid credentials');
@@ -50,7 +50,7 @@ export class AuthService {
         try {
             const user = await this.usersService.findUser({ id: userId });
 
-            const isRefreshTokenMatched = await this.securityService.verifyData(user.hashedRefreshToken, refreshToken);
+            const isRefreshTokenMatched = await this.securityService.verifyData({ hashedData: user.hashedRefreshToken, dataToCompare: refreshToken });
 
             if (!isRefreshTokenMatched)
                 throw new UnauthorizedException('Invalid refresh token');
@@ -81,7 +81,7 @@ export class AuthService {
         const createUserRequest = new CreateUserRequest();
 
         createUserRequest.email = registerRequest.email;
-        createUserRequest.hashedPassword = await this.securityService.hashData(registerRequest.password);
+        createUserRequest.hashedPassword = await this.securityService.hashData({ data: registerRequest.password });
 
         const user = await this.usersService.createUser(createUserRequest);
 
@@ -138,7 +138,7 @@ export class AuthService {
             }
         );
 
-        const hashedRefreshToken = await this.securityService.hashData(refreshToken);
+        const hashedRefreshToken = await this.securityService.hashData({ data: refreshToken });
 
         await this.usersService.updateUser(
             { id: user.id },

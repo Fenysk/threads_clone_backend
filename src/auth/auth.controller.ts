@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post,
 import { AuthService } from './auth.service';
 import { RegisterRequest } from './dto/register.request';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { GetUser } from './decorator/get-user.decorator';
+import { GetUser } from '../common/decorator/get-user.decorator';
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
