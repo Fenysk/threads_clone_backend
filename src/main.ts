@@ -7,6 +7,7 @@ import { join } from 'path';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from './auth/guards/jwt-access-auth.guard';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -29,10 +30,13 @@ async function bootstrap() {
   app.use(helmet());
 
   // Validation
-  app.useGlobalPipes(new ValidationPipe({}));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   // Global Auth Guard
   app.useGlobalGuards(new JwtAccessAuthGuard(app.get(Reflector)));
+
+  // Global Exception Filter
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Cookie Parser
   app.use(cookieParser());
