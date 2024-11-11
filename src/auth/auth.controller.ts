@@ -24,7 +24,7 @@ export class AuthController {
     @Public()
     @Post('register')
     register(
-        @Query() registerRequest: RegisterRequest,
+        @Body() registerRequest: RegisterRequest,
         @Res({ passthrough: true }) response: Response
     ) {
         return this.authService.register({ registerRequest, response });
