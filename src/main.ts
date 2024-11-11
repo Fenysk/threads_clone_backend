@@ -34,7 +34,19 @@ async function bootstrap() {
   app.use(helmet());
 
   // Validation
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    exceptionFactory: (errors) => {
+      const firstError = errors[0];
+      const firstConstraint = Object.values(firstError.constraints)[0];
+
+      return {
+        statusCode: 400,
+        message: firstConstraint,
+      };
+    }
+  })
+  );
 
   // Global Auth Guard
   app.useGlobalGuards(
