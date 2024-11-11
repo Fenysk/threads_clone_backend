@@ -1,11 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PostsService } from '../posts.service';
 
 @Injectable()
 export class RepostsService {
     constructor(
         private readonly prismaService: PrismaService,
+        private readonly postsService: PostsService,
     ) { }
+
+    async getMyReposts({
+        userId,
+    }: {
+        userId: string;
+    }): Promise<Post[]> {
+        const repostedPosts = await this.prismaService.repost.findMany({
+            where: { userId },
+            include: { Post: true },
+        });
+
+        const posts = await this.postsService.getPostsSummary({ postIds: repostedPosts.map(repost => repost.Post.id) });
+
+        return posts;
+    }
 
     async repostPost({
         userId,

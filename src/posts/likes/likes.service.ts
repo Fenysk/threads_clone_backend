@@ -1,11 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PostsService } from '../posts.service';
 
 @Injectable()
 export class LikesService {
     constructor(
         private readonly prismaService: PrismaService,
+        private readonly postsService: PostsService,
     ) { }
+
+    async getMyLikes({
+        userId,
+    }: {
+        userId: string;
+    }): Promise<Post[]> {
+        const likedPosts = await this.prismaService.like.findMany({
+            where: { userId },
+            include: { Post: true },
+        });
+
+        const posts = await this.postsService.getPostsSummary({ postIds: likedPosts.map(like => like.Post.id) });
+
+        return posts;
+    }
 
     async likePost({
         userId,

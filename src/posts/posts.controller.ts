@@ -70,6 +70,15 @@ export class PostsController {
         return this.postsService.deletePost(postId);
     }
 
+    @ApiOperation({ summary: 'Get posts reposted by user' })
+    @ApiResponse({ status: 200, description: 'The posts have been successfully retrieved.' })
+    @Get('my-reposts')
+    getMyReposts(
+        @GetUser() user: User,
+    ): Promise<PostModel[]> {
+        return this.repostsService.getMyReposts({ userId: user.id });
+    }
+
     @ApiOperation({ summary: 'Repost a post' })
     @ApiResponse({ status: 200, description: 'The post has been successfully reposted.' })
     @Post('repost/:postId')
@@ -89,6 +98,15 @@ export class PostsController {
         @Param('postId') postId: string
     ): Promise<string> {
         return this.repostsService.unrepostPost({ userId: user.id, postId });
+    }
+
+    @ApiOperation({ summary: 'Get posts liked by user' })
+    @ApiResponse({ status: 200, description: 'The posts have been successfully retrieved.' })
+    @Get('my-likes')
+    getMyLikes(
+        @GetUser() user: User,
+    ): Promise<PostModel[]> {
+        return this.likesService.getMyLikes({ userId: user.id });
     }
 
     @ApiOperation({ summary: 'Like a post' })

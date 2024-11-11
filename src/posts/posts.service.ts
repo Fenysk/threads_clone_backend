@@ -41,6 +41,50 @@ export class PostsService {
         return post;
     }
 
+    async getPostsSummary({
+        postIds,
+    }: {
+        postIds: string[];
+    }): Promise<Post[]> {
+        const posts = await this.prismaService.post.findMany({
+            where: { id: { in: postIds } },
+            include: {
+                Author: {
+                    include: { Profile: true },
+                },
+                _count: true,
+            },
+        });
+
+        return posts;
+    }
+
+    async getPostsDetails({
+        postIds,
+    }: {
+        postIds: string[];
+    }): Promise<Post[]> {
+        const posts = await this.prismaService.post.findMany({
+            where: { id: { in: postIds } },
+            include: {
+                Author: {
+                    include: { Profile: true },
+                },
+                Likes: true,
+                Reposts: true,
+                QuoteTo: true,
+                ReplyTo: true,
+                Hashtags: true,
+                Mentions: true,
+                Quotes: true,
+                Replies: true,
+                _count: true,
+            },
+        });
+
+        return posts;
+    }
+
     async createPost({
         user,
         createPostRequest,
