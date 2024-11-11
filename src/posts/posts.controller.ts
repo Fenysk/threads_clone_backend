@@ -30,6 +30,16 @@ export class PostsController {
         return this.timelineService.getForYouTimeline({ user, pagination });
     }
 
+    @ApiOperation({ summary: 'Get my following timeline' })
+    @ApiResponse({ status: 200, description: 'The timeline has been successfully retrieved.' })
+    @Get('following')
+    getFollowingTimeline(
+        @GetUser() user: User,
+        @Query() pagination: PaginationRequest
+    ): Promise<PostModel[]> {
+        return this.timelineService.getFollowingTimeline({ user, pagination });
+    }
+
     @ApiOperation({ summary: 'Get post details by id' })
     @ApiResponse({ status: 200, description: 'The post has been successfully retrieved.' })
     @Get('details/:postId')

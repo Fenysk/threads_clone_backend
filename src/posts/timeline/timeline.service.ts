@@ -95,4 +95,111 @@ export class TimelineService {
         return posts;
     }
 
+    async getFollowingTimeline({
+        user,
+        pagination
+    }: {
+        user: User,
+        pagination: PaginationRequest
+    }): Promise<Post[]> {
+        const { page, limit } = pagination;
+
+        const skip = (page - 1) * limit;
+
+        const followings = await this.prismaService.follow.findMany({
+            where: {
+                followerId: user.id
+            },
+            select: {
+                followingId: true
+            }
+        });
+
+        const followingIds = followings.map(follow => follow.followingId);
+
+        const posts = await this.prismaService.post.findMany({
+            where: {
+                AND: [
+                    {
+                        authorId: {
+                            in: followingIds
+                        }
+                    },
+                    {
+                        replyToId: null
+                    }
+                ]
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                Author: {
+                    include: {
+                        Profile: true,
+                    }
+                },
+                Likes: {
+                    where: {
+                        userId: user.id,
+                    }
+                },
+                Reposts: {
+                    where: {
+                        userId: user.id,
+                    }
+                },
+                Replies: {
+                    include: {
+                        Author: {
+                            include: {
+                                Profile: true,
+                            }
+                        },
+                        _count: {
+                            select: {
+                                Replies: true,
+                                Quotes: true,
+                                Likes: true,
+                                Reposts: true,
+                                Hashtags: true,
+                                Mentions: true,
+                            }
+                        }
+                    }
+                },
+                _count: {
+                    select: {
+                        Replies: true,
+                        Quotes: true,
+                        Likes: true,
+                        Reposts: true,
+                        Hashtags: true,
+                        Mentions: true,
+                    }
+                }
+            },
+            skip,
+            take: limit,
+        });
+
+        await this.prismaService.post.updateMany({
+            where: {
+                id: {
+                    in: posts.map(post => post.id)
+                },
+                authorId: {
+                    not: user.id
+                }
+            },
+            data: {
+                viewsCount: {
+                    increment: 1
+                }
+            }
+        });
+
+        return posts;
+    }
+
 }

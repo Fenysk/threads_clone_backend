@@ -30,7 +30,13 @@ export class PostsService {
                 Hashtags: true,
                 Mentions: true,
                 Quotes: true,
-                Replies: true,
+                Replies: {
+                    include: {
+                        Author: {
+                            include: { Profile: true },
+                        },
+                    },
+                },
                 _count: true,
             }
         });
