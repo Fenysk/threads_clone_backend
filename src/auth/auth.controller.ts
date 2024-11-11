@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterRequest } from './dto/register.request';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { ApiBadRequestResponse, ApiBody, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('auth')
@@ -17,21 +17,6 @@ export class AuthController {
     ) { }
 
     @ApiOperation({ summary: 'Register a new user' })
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                email: {
-                    type: 'string',
-                    format: 'email'
-                },
-                password: {
-                    type: 'string'
-                }
-            },
-            required: ['email', 'password']
-        }
-    })
     @ApiResponse({
         status: HttpStatus.CREATED,
         description: 'The user has been successfully registered'

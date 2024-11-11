@@ -1,8 +1,9 @@
-import { Controller, Get, HttpStatus, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Patch, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from '@prisma/client';
-import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-access-auth.guard';
+import { Profile, User } from '@prisma/client';
 import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { UpdateMyProfileRequest } from './dto/update-my-profile.request';
 
 @Controller('users')
 export class UsersController {
@@ -10,15 +11,56 @@ export class UsersController {
         private readonly usersService: UsersService
     ) { }
 
-    @ApiOperation({ summary: 'Get all users' })
+    @ApiOperation({ summary: 'Check if a pseudo is already used' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'The pseudo is already used'
+    })
+    @Get('check-pseudo')
+    checkIfPseudoAlreadyUsed(
+        @Query('pseudo') pseudo: string
+    ): Promise<void> {
+        return this.usersService.checkIfPseudoAlreadyUsed({ pseudo });
+    }
+
+    @ApiOperation({ summary: 'Get my profile' })
     @ApiCookieAuth('accessToken')
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'The users have been successfully retrieved'
+        description: 'The profile has been successfully retrieved'
     })
-    @Get()
-    getAllUsers(): Promise<User[]> {
-        return this.usersService.getAllUsers();
+    @Get('my-profile')
+    getMyProfile(
+        @GetUser() user: User
+    ): Promise<User & { Profile: Profile }> {
+        return this.usersService.getMyProfile({ user });
     }
 
+    @ApiOperation({ summary: 'Update my profile' })
+    @ApiCookieAuth('accessToken')
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'The profile has been successfully updated',
+    })
+    @Patch('my-profile')
+    updateMyProfile(
+        @GetUser() user: User,
+        @Body() updateMyProfileRequest: UpdateMyProfileRequest
+    ): Promise<User & { Profile: Profile }> {
+        return this.usersService.updateMyProfile({ user, updateMyProfileRequest });
+    }
+
+    @ApiOperation({ summary: 'Delete my profile' })
+    @ApiCookieAuth('accessToken')
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'The account has been successfully deleted',
+        type: String
+    })
+    @Delete('my-profile')
+    deleteMyProfile(
+        @GetUser() user: User
+    ): Promise<string> {
+        return this.usersService.deleteMyProfile({ user });
+    }
 }

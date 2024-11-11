@@ -62,7 +62,7 @@ export class AuthService {
     }
 
     async verifyUserGoogle({ googleProfile }: { googleProfile: Profile }) {
-        const { name, emails } = googleProfile;
+        const { emails } = googleProfile;
 
         const email = emails[0].value;
 
@@ -71,7 +71,7 @@ export class AuthService {
         try {
             user = await this.usersService.findUser({ email });
         } catch (error) {
-            user = await this.usersService.createUser({ email });
+            user = await this.usersService.createUser({ email, pseudo: email });
         }
 
         return user;
@@ -80,6 +80,7 @@ export class AuthService {
     async register({ registerRequest }: { registerRequest: RegisterRequest }) {
         const createUserRequest = new CreateUserRequest();
 
+        createUserRequest.pseudo = registerRequest.pseudo;
         createUserRequest.email = registerRequest.email;
         createUserRequest.hashedPassword = await this.securityService.hashData({ data: registerRequest.password });
 
