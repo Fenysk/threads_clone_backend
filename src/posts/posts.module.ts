@@ -1,17 +1,18 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
-import { TimelineService } from './timeline/timeline.service';
-import { RepostsService } from './reposts/reposts.service';
-import { LikesService } from './likes/likes.service';
+import { LikesModule } from './likes/likes.module';
+import { RepostsModule } from './reposts/reposts.module';
+import { TimelineModule } from './timeline/timeline.module';
 
 @Module({
+  imports: [
+    forwardRef(() => RepostsModule),
+    forwardRef(() => LikesModule),
+    TimelineModule,
+  ],
   controllers: [PostsController],
-  providers: [
-    PostsService,
-    TimelineService,
-    RepostsService,
-    LikesService,
-  ]
+  providers: [PostsService],
+  exports: [PostsService],
 })
 export class PostsModule { }
