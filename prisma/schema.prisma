@@ -42,7 +42,7 @@ model Profile {
   link        String?
   avatarUrl   String?
 
-  User User @relation("UserToProfile", fields: [userId], references: [id])
+  User User @relation("UserToProfile", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Post {
@@ -58,27 +58,23 @@ model Post {
   mediaUrls   String[]
 
   // Metrics
-  viewsCount   Int @default(0)
-  likesCount   Int @default(0)
-  repostsCount Int @default(0)
-  repliesCount Int @default(0)
-  quotesCount  Int @default(0)
+  viewsCount Int @default(0)
 
   // Relations
   authorId String @map("userId")
-  Author   User   @relation("UserToPost", fields: [authorId], references: [id])
+  Author   User   @relation("UserToPost", fields: [authorId], references: [id], onDelete: Cascade)
 
   replyToId String?
-  ReplyTo   Post?   @relation("PostToReply", fields: [replyToId], references: [id])
+  ReplyTo   Post?   @relation("PostToReply", fields: [replyToId], references: [id], onDelete: SetNull)
 
   quoteToId String?
-  QuoteTo   Post?   @relation("PostToQuote", fields: [quoteToId], references: [id])
+  QuoteTo   Post?   @relation("PostToQuote", fields: [quoteToId], references: [id], onDelete: SetNull)
 
   Likes    Like[]        @relation("PostToLike")
   Reposts  Repost[]      @relation("PostToRepost")
   Replies  Post[]        @relation("PostToReply")
   Quotes   Post[]        @relation("PostToQuote")
-  hashtags PostHashtag[] @relation("PostToHashtag")
+  Hashtags PostHashtag[] @relation("PostToHashtag")
   Mentions Mention[]     @relation("PostToMention")
 
   @@index([authorId])
@@ -90,10 +86,10 @@ model Like {
   createdAt DateTime @default(now())
 
   userId String
-  User   User   @relation("UserToLike", fields: [userId], references: [id])
+  User   User   @relation("UserToLike", fields: [userId], references: [id], onDelete: Cascade)
 
   postId String
-  Post   Post   @relation("PostToLike", fields: [postId], references: [id])
+  Post   Post   @relation("PostToLike", fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
   @@unique([userId, postId])
@@ -103,10 +99,10 @@ model Repost {
   createdAt DateTime @default(now())
 
   userId String
-  User   User   @relation("UserToRepost", fields: [userId], references: [id])
+  User   User   @relation("UserToRepost", fields: [userId], references: [id], onDelete: Cascade)
 
   postId String
-  Post   Post   @relation("PostToRepost", fields: [postId], references: [id])
+  Post   Post   @relation("PostToRepost", fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
   @@unique([userId, postId])
@@ -115,6 +111,8 @@ model Repost {
 model Hashtag {
   id String @id @unique @default(cuid())
 
+  createdAt DateTime @default(now())
+
   name String @unique
 
   Posts PostHashtag[] @relation("HashtagToPost")
@@ -122,10 +120,10 @@ model Hashtag {
 
 model PostHashtag {
   postId String
-  Post   Post   @relation("PostToHashtag", fields: [postId], references: [id])
+  Post   Post   @relation("PostToHashtag", fields: [postId], references: [id], onDelete: Cascade)
 
   hashtagId String
-  Hashtag   Hashtag @relation("HashtagToPost", fields: [hashtagId], references: [id])
+  Hashtag   Hashtag @relation("HashtagToPost", fields: [hashtagId], references: [id], onDelete: Cascade)
 
   @@id([postId, hashtagId])
   @@index([postId])
@@ -133,13 +131,11 @@ model PostHashtag {
 }
 
 model Mention {
-  createdAt DateTime @default(now())
-
   userId String
-  User   User   @relation("UserToMention", fields: [userId], references: [id])
+  User   User   @relation("UserToMention", fields: [userId], references: [id], onDelete: Cascade)
 
   postId String
-  Post   Post   @relation("PostToMention", fields: [postId], references: [id])
+  Post   Post   @relation("PostToMention", fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
   @@index([userId])
