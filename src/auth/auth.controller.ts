@@ -24,9 +24,10 @@ export class AuthController {
     @Public()
     @Post('register')
     register(
-        @Query() registerRequest: RegisterRequest
+        @Query() registerRequest: RegisterRequest,
+        @Res({ passthrough: true }) response: Response
     ) {
-        return this.authService.register({ registerRequest });
+        return this.authService.register({ registerRequest, response });
     }
 
     @ApiOperation({ summary: 'Login a user' })

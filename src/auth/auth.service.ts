@@ -77,7 +77,13 @@ export class AuthService {
         return user;
     }
 
-    async register({ registerRequest }: { registerRequest: RegisterRequest }) {
+    async register({
+        registerRequest,
+        response
+    }: {
+        registerRequest: RegisterRequest,
+        response: Response
+    }) {
         const createUserRequest = new CreateUserRequest();
 
         createUserRequest.pseudo = registerRequest.pseudo;
@@ -86,7 +92,7 @@ export class AuthService {
 
         const user = await this.usersService.createUser(createUserRequest);
 
-        return user;
+        await this.login({ user, response });
     }
 
     async login({
