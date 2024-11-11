@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FilesController } from './files.controller';
-import { FilesService } from './files.service';
+import { MediasController } from './medias.controller';
+import { MediasService } from './medias.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
@@ -17,7 +17,7 @@ import { diskStorage } from 'multer';
       })
     }),
   ],
-  controllers: [FilesController],
-  providers: [FilesService]
+  controllers: [MediasController],
+  providers: [MediasService]
 })
-export class FilesModule { }
+export class MediasModule { }

@@ -6,7 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { FilesModule } from './files/files.module';
+import { MediasModule } from './medias/medias.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { FilesModule } from './files/files.module';
     UsersModule,
     AuthModule,
     CommonModule,
-    FilesModule,
+    MediasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

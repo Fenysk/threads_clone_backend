@@ -2,10 +2,10 @@ import { BadRequestException, Controller, HttpStatus, Post, UploadedFile, UseInt
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileResponse } from './dto/file.response';
 import { ConfigService } from '@nestjs/config';
-import { ApiBody, ApiConsumes, ApiCookieAuth, ApiOperation, ApiParam, ApiProperty, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@Controller('files')
-export class FilesController {
+@Controller('medias')
+export class MediasController {
     constructor(
         private readonly configService: ConfigService,
     ) { }
