@@ -5,7 +5,6 @@ import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UpdateMyProfileRequest } from './dto/update-my-profile.request';
 import { Public } from 'src/common/decorator/public.decorator';
-import { Roles } from 'src/common/decorator/roles.decorator';
 
 @Controller('users')
 export class UsersController {

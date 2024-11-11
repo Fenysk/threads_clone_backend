@@ -20,11 +20,28 @@ model User {
 
   roles Role[] @default([common])
 
-  Profile  Profile?  @relation("UserToProfile")
-  Posts    Post[]    @relation("UserToPost")
-  Likes    Like[]    @relation("UserToLike")
-  Reposts  Repost[]  @relation("UserToRepost")
-  Mentions Mention[] @relation("UserToMention")
+  Profile   Profile?  @relation("UserToProfile")
+  Posts     Post[]    @relation("UserToPost")
+  Likes     Like[]    @relation("UserToLike")
+  Reposts   Repost[]  @relation("UserToRepost")
+  Mentions  Mention[] @relation("UserToMention")
+  Followers Follow[]  @relation("UserToFollowers")
+  Following Follow[]  @relation("UserToFollowing")
+}
+
+model Follow {
+  createdAt DateTime @default(now())
+
+  followerId String
+  Follower   User   @relation("UserToFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId String
+  Following   User   @relation("UserToFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }
 
 enum Role {

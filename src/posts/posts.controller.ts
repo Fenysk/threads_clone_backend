@@ -3,13 +3,14 @@ import { PostsService } from './posts.service';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { Post as PostModel, User } from '@prisma/client';
 import { CreatePostRequest } from './dto/create-post.request';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/dto/pagination.request';
 import { TimelineService } from './timeline/timeline.service';
 import { UpdatePostRequest } from './dto/update-post.request';
 import { RepostsService } from './reposts/reposts.service';
 import { LikesService } from './likes/likes.service';
 
+@ApiCookieAuth('accessToken')
 @Controller('posts')
 export class PostsController {
     constructor(
