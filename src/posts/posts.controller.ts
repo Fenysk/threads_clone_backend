@@ -8,12 +8,14 @@ import { PaginationRequest } from 'src/common/dto/pagination.request';
 import { TimelineService } from './timeline/timeline.service';
 import { UpdatePostRequest } from './dto/update-post.request';
 import { RepostsService } from './reposts/reposts.service';
+import { LikesService } from './likes/likes.service';
 
 @Controller('posts')
 export class PostsController {
     constructor(
         private readonly postsService: PostsService,
         private readonly repostsService: RepostsService,
+        private readonly likesService: LikesService,
         private readonly timelineService: TimelineService,
     ) { }
 
@@ -87,5 +89,25 @@ export class PostsController {
         @Param('postId') postId: string
     ): Promise<string> {
         return this.repostsService.unrepostPost({ userId: user.id, postId });
+    }
+
+    @ApiOperation({ summary: 'Like a post' })
+    @ApiResponse({ status: 200, description: 'The post has been successfully liked.' })
+    @Post('like/:postId')
+    likePost(
+        @GetUser() user: User,
+        @Param('postId') postId: string
+    ): Promise<string> {
+        return this.likesService.likePost({ userId: user.id, postId });
+    }
+
+    @ApiOperation({ summary: 'Unlike a post' })
+    @ApiResponse({ status: 200, description: 'The post has been successfully unliked.' })
+    @Delete('unlike/:postId')
+    unlikePost(
+        @GetUser() user: User,
+        @Param('postId') postId: string
+    ): Promise<string> {
+        return this.likesService.unlikePost({ userId: user.id, postId });
     }
 }
