@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsUrl, Matches, MaxLength } from 'class-validator';
 
 export class UpdateMyProfileRequest {
-    @ApiProperty({ required: false, nullable: false })
+    @ApiProperty({ required: false })
     @IsOptional()
     @Matches(/^[\w-]+$/, {
         message: 'Le pseudo ne doit contenir que des lettres, chiffres, tirets et underscores'

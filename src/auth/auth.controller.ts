@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterRequest } from './dto/register.request';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('auth')
@@ -24,20 +24,21 @@ export class AuthController {
     @Public()
     @Post('register')
     register(
-        @Body() registerRequest: RegisterRequest
+        @Param() registerRequest: RegisterRequest
     ) {
         return this.authService.register({ registerRequest });
     }
 
     @ApiOperation({ summary: 'Login a user' })
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                email: { type: 'string' },
-                password: { type: 'string' }
-            }
-        }
+    @ApiParam({
+        name: 'email',
+        type: 'string',
+        required: true
+    })
+    @ApiParam({
+        name: 'password',
+        type: 'string',
+        required: true
     })
     @ApiResponse({
         status: HttpStatus.OK,

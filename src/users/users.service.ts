@@ -95,7 +95,7 @@ export class UsersService {
         });
 
         if (existingUser)
-            throw new ConflictException('Ce pseudo est déjà utilisé');
+            throw new ConflictException('This pseudo is already used');
     }
 
     async updateMyProfile({
