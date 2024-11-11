@@ -47,7 +47,7 @@ export class UsersController {
     @Patch('my-profile')
     updateMyProfile(
         @GetUser() user: User,
-        @Param() updateMyProfileRequest: UpdateMyProfileRequest
+        @Query() updateMyProfileRequest: UpdateMyProfileRequest
     ): Promise<User & { Profile: Profile }> {
         return this.usersService.updateMyProfile({ user, updateMyProfileRequest });
     }

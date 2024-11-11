@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterRequest } from './dto/register.request';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { ApiBody, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('auth')
@@ -24,18 +24,18 @@ export class AuthController {
     @Public()
     @Post('register')
     register(
-        @Param() registerRequest: RegisterRequest
+        @Query() registerRequest: RegisterRequest
     ) {
         return this.authService.register({ registerRequest });
     }
 
     @ApiOperation({ summary: 'Login a user' })
-    @ApiParam({
+    @ApiQuery({
         name: 'email',
         type: 'string',
         required: true
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'password',
         type: 'string',
         required: true

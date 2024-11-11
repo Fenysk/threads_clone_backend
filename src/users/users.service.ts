@@ -90,7 +90,7 @@ export class UsersService {
     }): Promise<void> {
         const existingUser = await this.prismaService.profile.count({
             where: {
-                pseudo
+                pseudo: pseudo.toLowerCase()
             },
         });
 
