@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { Post as PostModel, User } from '@prisma/client';
 import { CreatePostRequest } from './dto/create-post.request';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/dto/pagination.request';
-import { TimelineService } from './services/timeline.service';
+import { TimelineService } from './timeline/timeline.service';
 import { UpdatePostRequest } from './dto/update-post.request';
+import { RepostsService } from './reposts/reposts.service';
 
 @Controller('posts')
 export class PostsController {
     constructor(
         private readonly postsService: PostsService,
+        private readonly repostsService: RepostsService,
         private readonly timelineService: TimelineService,
     ) { }
 
@@ -27,11 +29,11 @@ export class PostsController {
 
     @ApiOperation({ summary: 'Get post details by id' })
     @ApiResponse({ status: 200, description: 'The post has been successfully retrieved.' })
-    @Get('details')
+    @Get('details/:postId')
     getPostById(
-        @Query('id') id: string
+        @Param('postId') postId: string
     ): Promise<PostModel> {
-        return this.postsService.getPostDetailsById(id);
+        return this.postsService.getPostDetailsById({ postId });
     }
 
     @ApiOperation({ summary: 'Create a post' })
@@ -64,5 +66,26 @@ export class PostsController {
         @Param('postId') postId: string
     ): Promise<string> {
         return this.postsService.deletePost(postId);
+    }
+
+    @ApiOperation({ summary: 'Repost a post' })
+    @ApiResponse({ status: 200, description: 'The post has been successfully reposted.' })
+    @Post('repost/:postId')
+    @HttpCode(HttpStatus.CREATED)
+    repostPost(
+        @GetUser() user: User,
+        @Param('postId') postId: string
+    ): Promise<string> {
+        return this.repostsService.repostPost({ userId: user.id, postId });
+    }
+
+    @ApiOperation({ summary: 'Unrepost a post' })
+    @ApiResponse({ status: 200, description: 'The post has been successfully unreposted.' })
+    @Delete('unrepost/:postId')
+    unrepostPost(
+        @GetUser() user: User,
+        @Param('postId') postId: string
+    ): Promise<string> {
+        return this.repostsService.unrepostPost({ userId: user.id, postId });
     }
 }

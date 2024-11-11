@@ -10,9 +10,13 @@ export class PostsService {
         private readonly prismaService: PrismaService,
     ) { }
 
-    async getPostDetailsById(id: string): Promise<Post> {
+    async getPostDetailsById({
+        postId,
+    }: {
+        postId: string;
+    }): Promise<Post> {
         const post = await this.prismaService.post.findUnique({
-            where: { id },
+            where: { id: postId },
             include: {
                 Author: {
                     include: {
@@ -86,7 +90,7 @@ export class PostsService {
             },
         });
 
-        const post = await this.getPostDetailsById(newPost.id);
+        const post = await this.getPostDetailsById({ postId: newPost.id });
 
         return post;
     }
@@ -152,7 +156,7 @@ export class PostsService {
             },
         });
 
-        const updatedPost = await this.getPostDetailsById(postId);
+        const updatedPost = await this.getPostDetailsById({ postId });
 
         return updatedPost;
     }
