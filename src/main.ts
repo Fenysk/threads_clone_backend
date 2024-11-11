@@ -13,6 +13,9 @@ import { RolesGuard } from './common/guards/roles.guard';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // CORS
+  app.enableCors();
+
   // Swagger
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Backend Skeleton')
