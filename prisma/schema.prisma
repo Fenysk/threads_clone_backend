@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id String @id @default(cuid())
+  id String @id @unique @default(cuid())
 
   email String? @unique
 
@@ -16,8 +16,21 @@ model User {
   hashedRefreshToken String?
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  Profile Profile? @relation("UserToProfile")
+  roles Role[] @default([common])
+
+  Profile  Profile?  @relation("UserToProfile")
+  Posts    Post[]    @relation("UserToPost")
+  Likes    Like[]    @relation("UserToLike")
+  Reposts  Repost[]  @relation("UserToRepost")
+  Mentions Mention[] @relation("UserToMention")
+}
+
+enum Role {
+  common
+  verified
+  admin
 }
 
 model Profile {
@@ -30,4 +43,105 @@ model Profile {
   avatarUrl   String?
 
   User User @relation("UserToProfile", fields: [userId], references: [id])
+}
+
+model Post {
+  // Metadata
+  id String @id @unique @default(cuid())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  editedAt  DateTime?
+
+  // Content
+  textContent String   @db.Text
+  mediaUrls   String[]
+
+  // Metrics
+  viewsCount   Int @default(0)
+  likesCount   Int @default(0)
+  repostsCount Int @default(0)
+  repliesCount Int @default(0)
+  quotesCount  Int @default(0)
+
+  // Relations
+  authorId String @map("userId")
+  Author   User   @relation("UserToPost", fields: [authorId], references: [id])
+
+  replyToId String?
+  ReplyTo   Post?   @relation("PostToReply", fields: [replyToId], references: [id])
+
+  quoteToId String?
+  QuoteTo   Post?   @relation("PostToQuote", fields: [quoteToId], references: [id])
+
+  Likes    Like[]        @relation("PostToLike")
+  Reposts  Repost[]      @relation("PostToRepost")
+  Replies  Post[]        @relation("PostToReply")
+  Quotes   Post[]        @relation("PostToQuote")
+  hashtags PostHashtag[] @relation("PostToHashtag")
+  Mentions Mention[]     @relation("PostToMention")
+
+  @@index([authorId])
+  @@index([replyToId])
+  @@index([quoteToId])
+}
+
+model Like {
+  createdAt DateTime @default(now())
+
+  userId String
+  User   User   @relation("UserToLike", fields: [userId], references: [id])
+
+  postId String
+  Post   Post   @relation("PostToLike", fields: [postId], references: [id])
+
+  @@id([userId, postId])
+  @@unique([userId, postId])
+}
+
+model Repost {
+  createdAt DateTime @default(now())
+
+  userId String
+  User   User   @relation("UserToRepost", fields: [userId], references: [id])
+
+  postId String
+  Post   Post   @relation("PostToRepost", fields: [postId], references: [id])
+
+  @@id([userId, postId])
+  @@unique([userId, postId])
+}
+
+model Hashtag {
+  id String @id @unique @default(cuid())
+
+  name String @unique
+
+  Posts PostHashtag[] @relation("HashtagToPost")
+}
+
+model PostHashtag {
+  postId String
+  Post   Post   @relation("PostToHashtag", fields: [postId], references: [id])
+
+  hashtagId String
+  Hashtag   Hashtag @relation("HashtagToPost", fields: [hashtagId], references: [id])
+
+  @@id([postId, hashtagId])
+  @@index([postId])
+  @@index([hashtagId])
+}
+
+model Mention {
+  createdAt DateTime @default(now())
+
+  userId String
+  User   User   @relation("UserToMention", fields: [userId], references: [id])
+
+  postId String
+  Post   Post   @relation("PostToMention", fields: [postId], references: [id])
+
+  @@id([userId, postId])
+  @@index([userId])
+  @@index([postId])
 }

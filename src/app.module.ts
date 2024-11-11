@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { MediasModule } from './medias/medias.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MediasModule } from './medias/medias.module';
     AuthModule,
     CommonModule,
     MediasModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
