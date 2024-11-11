@@ -45,7 +45,11 @@ export class MediasController {
         },
     })
     @Post('upload')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: {
+            fileSize: 512 * 1024 * 1024 // 0.5GB
+        }
+    }))
     async uploadFile(
         @UploadedFile() file: Express.Multer.File
     ): Promise<FileResponse> {
