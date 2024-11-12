@@ -167,16 +167,11 @@ export class AuthService {
             expires: expiresRefreshToken,
         });
 
-        response.send(`
-            <html>
-                <head>
-                    <title>Authentification réussie</title>
-                </head>
-                <body>
-                    <p>Vous êtes maintenant connecté</p>
-                </body>
-            </html>
-        `);
+        const userWithProfile = await this.usersService.getMyProfile({ user });
+
+        response.json({
+            user: userWithProfile
+        });
     }
 
 }
