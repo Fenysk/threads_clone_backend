@@ -178,4 +178,17 @@ export class AuthService {
         });
     }
 
+    async logout({
+        user
+    }: {
+        user: User
+    }): Promise<string> {
+        await this.usersService.updateUser(
+            { id: user.id },
+            { hashedRefreshToken: null }
+        );
+
+        return `User ${user.id} has been successfully logged out`;
+    }
+
 }

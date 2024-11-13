@@ -73,6 +73,19 @@ export class AuthController {
         await this.authService.login({ user, response });
     }
 
+    @ApiOperation({ summary: 'Logout a user' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'The user has been successfully logged out'
+    })
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    async logout(
+        @GetUser() user: User,
+    ): Promise<string> {
+        return await this.authService.logout({ user });
+    }
+
     @ApiOperation({ summary: 'Redirect to Google login' })
     @ApiResponse({
         status: HttpStatus.OK,
