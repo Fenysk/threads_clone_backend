@@ -156,13 +156,13 @@ export class AuthService {
 
         // Response cookies
         response.cookie('accessToken', accessToken, {
-            httpOnly: true,
+            httpOnly: false,
             secure: shouldHaveSecureConnection,
             expires: expiresAccessToken,
         });
 
         response.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
+            httpOnly: false,
             secure: shouldHaveSecureConnection,
             expires: expiresRefreshToken,
         });
@@ -170,6 +170,10 @@ export class AuthService {
         const userWithProfile = await this.usersService.getMyProfile({ user });
 
         response.json({
+            tokens: {
+                accessToken,
+                refreshToken
+            },
             user: userWithProfile
         });
     }
