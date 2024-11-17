@@ -1,23 +1,24 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+    private readonly logger = new Logger(PrismaService.name);
 
-    onModuleInit() {
-        this.$connect()
-            .then(() => console.log('Connected to the database'))
-            .catch((error) => console.error('Failed to connect to the database : ', error));
+    async onModuleInit() {
+        await this.$connect()
+            .then(() => this.logger.log('Connected to the database'))
+            .catch((error) => this.logger.error('Failed to connect to the database : ', error));
     }
 
-    onModuleDestroy() {
-        this.$disconnect()
-            .then(() => console.log('Disconnected from the database'))
-            .catch((error) => console.error('Failed to disconnect from the database : ', error));
+    async onModuleDestroy() {
+        await this.$disconnect()
+            .then(() => this.logger.log('Disconnected from the database'))
+            .catch((error) => this.logger.error('Failed to disconnect from the database : ', error));
     }
 
     handleError(error: Error): never {
-        console.error('Database error:', error);
+        this.logger.error('Database error:', error);
 
         if (error.name === 'PrismaClientKnownRequestError') {
             const prismaError = error as Prisma.PrismaClientKnownRequestError;
