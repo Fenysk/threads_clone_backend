@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Post, User } from '@prisma/client';
 import { PaginationRequest } from 'src/common/dto/pagination.request';
+import { enrichedPost } from './models/enriched-post.model';
+import { PostsService } from '../posts.service';
 
 @Injectable()
 export class TimelineService {
     constructor(
-        private readonly prismaService: PrismaService
+        private readonly prismaService: PrismaService,
+        private readonly postsService: PostsService,
     ) { }
 
     async getForYouTimeline({
@@ -15,7 +18,7 @@ export class TimelineService {
     }: {
         user: User
         pagination: PaginationRequest
-    }): Promise<Post[]> {
+    }): Promise<enrichedPost[]> {
         const { page, limit } = pagination;
 
         const skip = (page - 1) * limit;
@@ -92,7 +95,9 @@ export class TimelineService {
             }
         });
 
-        return posts;
+        const enrichedPosts = posts.map(originalPost => this.postsService.transformPostToEnriched(originalPost, user.id));
+
+        return enrichedPosts;
     }
 
     async getFollowingTimeline({

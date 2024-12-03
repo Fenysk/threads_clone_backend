@@ -3,6 +3,7 @@ import { CreatePostRequest } from './dto/create-post.request';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Post, User } from '@prisma/client';
 import { UpdatePostRequest } from './dto/update-post.request';
+import { enrichedPost } from './timeline/models/enriched-post.model';
 
 @Injectable()
 export class PostsService {
@@ -224,6 +225,24 @@ export class PostsService {
         });
 
         return `Post ${postId} deleted`;
+    }
+
+    transformPostToEnriched(
+        originalPost: Post & {
+            Likes?: { userId: string }[];
+            Reposts?: { userId: string }[];
+            Replies?: { userId: string }[];
+        },
+        userId: string,
+    ): enrichedPost {
+        return {
+            ...originalPost,
+            _enriched: {
+                isLiked: originalPost.Likes?.some(like => like.userId === userId) || false,
+                isReposted: originalPost.Reposts?.some(repost => repost.userId === userId) || false,
+                isReplied: originalPost.Replies?.some(reply => reply.userId === userId) || false,
+            },
+        };
     }
 
 }

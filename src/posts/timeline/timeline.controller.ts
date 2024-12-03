@@ -4,6 +4,7 @@ import { TimelineService } from './timeline.service';
 import { Post, User } from '@prisma/client';
 import { PaginationRequest } from 'src/common/dto/pagination.request';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { enrichedPost } from './models/enriched-post.model';
 
 @Controller('timeline')
 export class TimelineController {
@@ -17,7 +18,7 @@ export class TimelineController {
     getForYouTimeline(
         @GetUser() user: User,
         @Query() pagination: PaginationRequest
-    ): Promise<Post[]> {
+    ): Promise<enrichedPost[]> {
         return this.timelineService.getForYouTimeline({ user, pagination });
     }
 
