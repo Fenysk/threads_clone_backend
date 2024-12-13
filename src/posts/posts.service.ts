@@ -99,6 +99,8 @@ export class PostsService {
         user: User;
         createPostRequest: CreatePostRequest;
     }): Promise<EnrichedPost> {
+        console.log(user);
+        console.log(createPostRequest);
         const hashtagRegex = /#([a-zA-Z]+)/g;
         const foundHashtags = [...createPostRequest.textContent.matchAll(hashtagRegex)]
             .map(match => match[1]);
@@ -121,6 +123,7 @@ export class PostsService {
                 authorId: user.id,
                 replyToId: createPostRequest.replyToId,
                 quoteToId: createPostRequest.quoteToId,
+                visibility: createPostRequest.visibility,
 
                 Hashtags: {
                     create: foundHashtags.map(hashtag => ({
@@ -137,7 +140,8 @@ export class PostsService {
                     create: foundUsers.map(user => ({
                         User: { connect: { id: user.id } }
                     }))
-                }
+                },
+
             },
         });
 

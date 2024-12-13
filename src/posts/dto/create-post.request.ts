@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { Visibility } from "@prisma/client";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class CreatePostRequest {
     @ApiProperty()
@@ -22,4 +23,9 @@ export class CreatePostRequest {
     @IsOptional()
     @IsString()
     quoteToId?: string;
+
+    @ApiProperty({ required: false, enum: Visibility })
+    @IsOptional()
+    @IsEnum(Visibility)
+    visibility?: Visibility
 }

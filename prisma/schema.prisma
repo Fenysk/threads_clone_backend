@@ -71,8 +71,9 @@ model Post {
   editedAt  DateTime?
 
   // Content
-  textContent String   @db.Text
+  textContent String     @db.Text
   mediaUrls   String[]
+  visibility  Visibility @default(everyone)
 
   // Metrics
   viewsCount Int @default(0)
@@ -97,6 +98,12 @@ model Post {
   @@index([authorId])
   @@index([replyToId])
   @@index([quoteToId])
+}
+
+enum Visibility {
+  everyone
+  followings
+  mentioned
 }
 
 model Like {
