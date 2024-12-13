@@ -5,6 +5,7 @@ import { Post as PostModel, User } from '@prisma/client';
 import { CreatePostRequest } from './dto/create-post.request';
 import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UpdatePostRequest } from './dto/update-post.request';
+import { EnrichedPost } from './timeline/models/enriched-post.model';
 
 @ApiCookieAuth('accessToken')
 @Controller('posts')
@@ -28,7 +29,7 @@ export class PostsController {
     createPost(
         @GetUser() user: User,
         @Body() createPostRequest: CreatePostRequest
-    ): Promise<PostModel> {
+    ): Promise<EnrichedPost> {
         return this.postsService.createPost({
             user,
             createPostRequest,

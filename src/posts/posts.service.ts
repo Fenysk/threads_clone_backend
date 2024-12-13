@@ -3,7 +3,7 @@ import { CreatePostRequest } from './dto/create-post.request';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Post, User } from '@prisma/client';
 import { UpdatePostRequest } from './dto/update-post.request';
-import { enrichedPost } from './timeline/models/enriched-post.model';
+import { EnrichedPost } from './timeline/models/enriched-post.model';
 
 @Injectable()
 export class PostsService {
@@ -98,7 +98,7 @@ export class PostsService {
     }: {
         user: User;
         createPostRequest: CreatePostRequest;
-    }): Promise<Post> {
+    }): Promise<EnrichedPost> {
         const hashtagRegex = /#([a-zA-Z]+)/g;
         const foundHashtags = [...createPostRequest.textContent.matchAll(hashtagRegex)]
             .map(match => match[1]);
@@ -143,7 +143,9 @@ export class PostsService {
 
         const post = await this.getPostDetailsById({ postId: newPost.id });
 
-        return post;
+        const enrichedPost = this.transformPostToEnriched(post, user.id);
+
+        return enrichedPost;
     }
 
     async updatePost({
@@ -234,7 +236,7 @@ export class PostsService {
             Replies?: { userId: string }[];
         },
         userId: string,
-    ): enrichedPost {
+    ): EnrichedPost {
         return {
             ...originalPost,
             _enriched: {

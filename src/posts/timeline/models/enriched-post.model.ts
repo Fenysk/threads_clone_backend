@@ -1,6 +1,6 @@
 import { Post } from "@prisma/client";
 
-export type enrichedPost = Post & {
+export type EnrichedPost = Post & {
     _enriched: {
         isLiked: boolean;
         isReposted: boolean;

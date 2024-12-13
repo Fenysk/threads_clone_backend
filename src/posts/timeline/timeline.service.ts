@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Post, User } from '@prisma/client';
 import { PaginationRequest } from 'src/common/dto/pagination.request';
-import { enrichedPost } from './models/enriched-post.model';
+import { EnrichedPost } from './models/enriched-post.model';
 import { PostsService } from '../posts.service';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class TimelineService {
     }: {
         user: User
         pagination: PaginationRequest
-    }): Promise<enrichedPost[]> {
+    }): Promise<EnrichedPost[]> {
         const { page, limit } = pagination;
 
         const skip = (page - 1) * limit;
