@@ -34,7 +34,7 @@ export class UsersController {
     @Get('my-profile')
     getMyProfile(
         @GetUser() user: User
-    ): Promise<User & { Profile: Profile }> {
+    ): Promise<User & { Profile: Profile, _count: any }> {
         return this.usersService.getMyProfile({ user });
     }
 

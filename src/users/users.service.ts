@@ -18,10 +18,13 @@ export class UsersService {
         user,
     }: {
         user: User
-    }): Promise<User & { Profile: Profile }> {
+    }): Promise<User & { Profile: Profile, _count: any }> {
         const fetchUser = await this.prismaService.user.findUnique({
             where: { id: user.id },
-            include: { Profile: true }
+            include: {
+                Profile: true,
+                _count: true,
+            }
         });
 
         if (!fetchUser)
